@@ -86,7 +86,7 @@ static void initializeGlutCallbacks()
 static void createVertexBuffer()
 {
 	aitMesh mesh;
-	if(!mesh.loadFromObj("assets/box.obj"))
+	if(!mesh.loadFromObj("assets/monkey.obj"))
 	{
 		cerr<<"Error loading mesh from obj file."<<endl;
 		system("pause");
