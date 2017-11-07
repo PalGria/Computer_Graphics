@@ -20,7 +20,10 @@ int NUMVERTS = 0;
 
 // Transform uniforms location
 GLuint gModelToWorldTransformLoc;
-GLuint gMoonTransforms;
+GLuint gReigenTransformsLoc;
+GLuint gShigeoTransformsLoc;
+GLuint gReigenMoonTransformsLoc;
+GLuint gShigeoMoonTransformsLoc;
 
 GLuint gWorldToViewToProjectionTransformLoc;
 
@@ -67,24 +70,57 @@ static void renderSceneCallBack()
 	// Draw the model
 	mat4 modelToWorldTransform = mat4(1.0f);
 
-	mat4 MoonTransforms = mat4(1.0f);
+	mat4 ReigenTransforms = mat4(1.0f);
+	mat4 ReigenMoonTransforms = mat4(1.0f);
+	mat4 ShigeoTransforms = mat4(1.0f);
+	mat4 ShigeoMoonTransforms = mat4(1.0f);
 
-	static float angle = 0.0f;
-	angle+=0.25f;
+	static float angleReigen = 0.0f;
+	angleReigen+=0.15f;
 
-	MoonTransforms = rotate(MoonTransforms, angle, vec3(1.0f, 0.0f, 0.5f));
+	static float angleShigeo = 0.0f;
+	angleShigeo += 0.2f;
+	//reigen transforms
+	ReigenTransforms = rotate(ReigenTransforms, angleReigen, vec3(0.0f, 0.5f, 0.0f));
+	ReigenTransforms = translate(ReigenTransforms, vec3(2.0f, 0.0f, 0.0f));
+	ReigenTransforms = scale(ReigenTransforms, vec3(0.4, 0.4, 0.4));
 
-	MoonTransforms = translate(MoonTransforms, vec3(0.0f, 2.0f, 0.0f));
-	MoonTransforms = scale(MoonTransforms, vec3(0.4, 0.4, 0.4));
+	ReigenMoonTransforms = ReigenTransforms;
+
+	ReigenMoonTransforms = rotate(ReigenMoonTransforms, angleReigen, vec3(0.0f, 0.5f, 0.0f));
+	ReigenMoonTransforms = translate(ReigenMoonTransforms, vec3(2.0f, 0.0f, 0.0f));
+	ReigenMoonTransforms = scale(ReigenMoonTransforms, vec3(0.4, 0.4, 0.4));
+	//shigeo transforms
+	ShigeoTransforms = rotate(ShigeoTransforms, angleShigeo, vec3(0.0f, 1.0f, 0.0f));
+	ShigeoTransforms = translate(ShigeoTransforms, vec3(-4.0f, 0.0f, 0.0f));
+	ShigeoTransforms = scale(ShigeoTransforms, vec3(0.4, 0.4, 0.4));
+
+	ShigeoMoonTransforms = ShigeoTransforms; 
+
+	ShigeoMoonTransforms = rotate(ShigeoMoonTransforms, angleShigeo, vec3(0.0f, 1.0f, 0.0f));
+	ShigeoMoonTransforms = translate(ShigeoMoonTransforms, vec3( 2.0f, 0.0f, 0.0f));
+	ShigeoMoonTransforms = scale(ShigeoMoonTransforms, vec3(0.4, 0.4, 0.4));
 
 
-
-	modelToWorldTransform = rotate(modelToWorldTransform, angle, vec3(0.0f, 1.0f, 0.0f));
+	modelToWorldTransform = rotate(modelToWorldTransform, angleReigen, vec3(0.0f, 1.0f, 0.0f));
 
 	glUniformMatrix4fv(gModelToWorldTransformLoc, 1, GL_FALSE, &modelToWorldTransform[0][0]);
 	glDrawArrays(GL_TRIANGLES, 0, NUMVERTS);
-	glUniformMatrix4fv(gMoonTransforms, 1, GL_FALSE, &MoonTransforms[0][0]);
+	//reigen
+	glUniformMatrix4fv(gReigenTransformsLoc, 1, GL_FALSE, &ReigenTransforms[0][0]);
 	glDrawArrays(GL_TRIANGLES, 0, NUMVERTS);
+
+	glUniformMatrix4fv(gReigenMoonTransformsLoc, 1, GL_FALSE, &ReigenMoonTransforms[0][0]);
+	glDrawArrays(GL_TRIANGLES, 0, NUMVERTS);
+
+
+	//shigeo
+	glUniformMatrix4fv(gShigeoTransformsLoc, 1, GL_FALSE, &ShigeoTransforms[0][0]);
+	glDrawArrays(GL_TRIANGLES, 0, NUMVERTS);
+
+	glUniformMatrix4fv(gShigeoMoonTransformsLoc, 1, GL_FALSE, &ShigeoMoonTransforms[0][0]);
+	glDrawArrays(GL_TRIANGLES, 0, NUMVERTS);
+
 
     glDisableVertexAttribArray(0);
 	glDisableVertexAttribArray(1);
@@ -212,10 +248,27 @@ static void buildShaders()
 
     glUseProgram(shaderProgram);
 
+	//The frickin sun
     gModelToWorldTransformLoc = glGetUniformLocation(shaderProgram, "gModelToWorldTransform");
     assert(gModelToWorldTransformLoc != 0xFFFFFFFF);
-	gMoonTransforms = glGetUniformLocation(shaderProgram, "gModelToWorldTransform");
-	assert(gMoonTransforms != 0xFFFFFFFF);
+
+	//Reigen and his moon
+	gReigenTransformsLoc = glGetUniformLocation(shaderProgram, "gModelToWorldTransform");
+	assert(gModelToWorldTransformLoc != 0xFFFFFFFF);
+
+	gReigenMoonTransformsLoc = glGetUniformLocation(shaderProgram, "gModelToWorldTransform");
+	assert(gReigenMoonTransformsLoc != 0xFFFFFFFF);
+	
+	//Shigeo and his moon
+	gShigeoTransformsLoc = glGetUniformLocation(shaderProgram, "gModelToWorldTransform");
+	assert(gShigeoTransformsLoc != 0xFFFFFFFF);
+
+	gShigeoMoonTransformsLoc = glGetUniformLocation(shaderProgram, "gModelToWorldTransform");
+	assert(gShigeoMoonTransformsLoc != 0xFFFFFFFF);
+
+
+
+
     gWorldToViewToProjectionTransformLoc = glGetUniformLocation(shaderProgram, "gWorldToViewToProjectionTransform");
     assert(gWorldToViewToProjectionTransformLoc != 0xFFFFFFFF);
 	gAmbientLightIntensityLoc = glGetUniformLocation(shaderProgram, "gAmbientLightIntensity");

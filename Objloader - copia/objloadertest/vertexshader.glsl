@@ -27,6 +27,10 @@ void main()
 	vec4 vertexPositionInModelSpace = vec4(Position, 1);
 	vec4 vertexInWorldSpace = gModelToWorldTransform * vertexPositionInModelSpace;
 	vec4 vertexInHomogeneousClipSpace = gWorldToViewToProjectionTransform * vertexInWorldSpace;
+	
+	FragColor = vec4(0.0, 1.0, 0.0, 1.0);
+
+	
 	gl_Position = vertexInHomogeneousClipSpace;
 
 	// Calculate the ambient light intensity at the vertex
