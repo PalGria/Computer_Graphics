@@ -14,17 +14,18 @@ using namespace glm;
 
 const int windowWidth = 1024;
 const int windowHeight = 768;
-
+const int maxPlanets = 3; 
 GLuint VBO;
 int NUMVERTS = 0;
 
 // Transform uniforms location
 GLuint gModelToWorldTransformLoc;
+/*
 GLuint gReigenTransformsLoc;
 GLuint gShigeoTransformsLoc;
 GLuint gReigenMoonTransformsLoc;
 GLuint gShigeoMoonTransformsLoc;
-
+*/
 GLuint gRedLocation;
 GLuint gBlueLocation;
 GLuint gGreenLocation;
@@ -40,6 +41,158 @@ GLuint gDirectionalLightDirectionLoc;
 GLuint gKaLoc;
 GLuint gKdLoc;
 
+class Sun {
+	private: 
+		mat4 transforms;
+		float red, blue, green, size;
+		Planet planets[maxPlanets];
+		int planetsNumber;
+		float speed;
+
+	public:	
+		Sun() {
+			transforms = mat4(1.0f);
+			planetsNumber = 0;
+			red = 1.0f;
+			blue = 1.0f;
+			green = 1.0f;
+
+			size = 1.0f;
+		}
+		void addPlanet(Planet planet) {
+			if (planetsNumber < maxPlanets) {
+				planets[planetsNumber] = planet;
+				planetsNumber++;
+
+			}
+		}
+		void setColor(float r, float g, float b) {
+			red = r;
+			green = g;
+			blue = b;
+		}
+		mat4 rotateObj(float angle, float x, float y, float z) {
+			transforms = rotate(transforms, angle, vec3(0.0f, 0.5f, 0.0f));
+			return transforms;
+		}
+		mat4 scaleObj(float size) {
+			transforms = scale(transforms, vec3(size, size, size));
+			return transforms;
+
+		}
+		mat4 translateOBJ(float x, float y, float z) {
+			transforms = translate(transforms, vec3(x, y, z));
+			return transforms;
+		}
+		mat4 getTransforms() {
+			return transforms; 
+		}
+		void setSpeed(float s) {
+			speed = s;
+		}
+		float getSpeed() {
+			return speed;
+		}
+};
+class Planet {
+private:
+	mat4 transforms;
+	float red, blue, green, size, distance;
+	Moon moons[maxPlanets];
+	int moonsNumber;
+	float speed;
+
+public:
+	Planet() {
+		transforms = mat4(1.0f);
+		red = 1.0f;
+		blue = 1.0f;
+		green = 1.0f;
+
+	}
+
+	void addMoon(Moon moon) {
+		if (moonsNumber < maxPlanets) {
+			moons[moonsNumber] = moon;
+			moonsNumber++;
+
+		}
+	}
+	void setColor(float r, float g, float b) {
+		red = r;
+		green = g;
+		blue = b;
+	}
+	mat4 rotateObj(float angle, float x, float y, float z) {
+		transforms = rotate(transforms, angle, vec3(0.0f, 0.5f, 0.0f));
+		return transforms;
+	}
+	mat4 scaleObj(float size) {
+		transforms = scale(transforms, vec3(size, size, size));
+		return transforms;
+
+	}
+	mat4 translateOBJ(float x, float y, float z) {
+		transforms = translate(transforms, vec3(x, y, z));
+		return transforms;
+	}
+	mat4 getTransforms() {
+		return transforms;
+	}
+	void setSpeed(float s) {
+		speed = s;
+	}
+	float getSpeed() {
+		return speed;
+	}
+};
+class Moon {
+private:
+	mat4 transforms;
+	float red, blue, green, size, distance;
+	float speed;
+public:
+	Moon() {
+		transforms = mat4(1.0f);
+		red = 1.0f;
+		blue = 1.0f;
+		green = 1.0f;
+
+	}
+
+	void setColor(float r, float g, float b) {
+		red = r;
+		green = g;
+		blue = b;
+	}
+	mat4 rotateObj(float angle, float x, float y, float z) {
+		transforms = rotate(transforms, angle, vec3(0.0f, 0.5f, 0.0f));
+		return transforms;
+	}
+	mat4 scaleObj(float size) {
+		transforms = scale(transforms, vec3(size, size, size));
+		return transforms;
+
+	}
+	mat4 translateOBJ(float x,float y,float z) {
+		transforms = translate(transforms, vec3(x, y, z));
+		return transforms;
+	}
+	mat4 getTransforms() {
+		return transforms;
+	}
+	void setSpeed(float s) {
+		speed = s;
+	}
+	float getSpeed() {
+		return speed;
+	}
+
+};
+static void update() {
+
+
+}
 static void renderSceneCallBack()
 {
 	// Clear the back buffer and the z-buffer
@@ -85,7 +238,7 @@ static void renderSceneCallBack()
 	glUniform1f(gRedLocation , red);
 	glUniform1f(gBlueLocation, blue);
 	glUniform1f(gGreenLocation, green);
-
+	/*
 	static float angleReigen = 0.0f;
 	angleReigen += 0.15f;
 
@@ -143,7 +296,7 @@ static void renderSceneCallBack()
 
 	glDisableVertexAttribArray(0);
 	glDisableVertexAttribArray(1);
-
+	*/
 	glutSwapBuffers();
 }
 
@@ -270,7 +423,7 @@ static void buildShaders()
 	//The frickin sun
 	gModelToWorldTransformLoc = glGetUniformLocation(shaderProgram, "gModelToWorldTransform");
 	assert(gModelToWorldTransformLoc != 0xFFFFFFFF);
-
+	/*
 	//Reigen and his moon
 	gReigenTransformsLoc = glGetUniformLocation(shaderProgram, "gModelToWorldTransform");
 	assert(gModelToWorldTransformLoc != 0xFFFFFFFF);
@@ -284,7 +437,10 @@ static void buildShaders()
 
 	gShigeoMoonTransformsLoc = glGetUniformLocation(shaderProgram, "gModelToWorldTransform");
 	assert(gShigeoMoonTransformsLoc != 0xFFFFFFFF);
-
+	
+	gShigeoMoonTransformsLoc = glGetUniformLocation(shaderProgram, "gModelToWorldTransform");
+	assert(gShigeoMoonTransformsLoc != 0xFFFFFFFF);
+	*/
 	gRedLocation = glGetUniformLocation(shaderProgram, "red");
 	assert(gRedLocation != 0xFFFFFFFF);
 	gGreenLocation = glGetUniformLocation(shaderProgram, "green");
@@ -292,8 +448,7 @@ static void buildShaders()
 	gBlueLocation = glGetUniformLocation(shaderProgram, "blue");
 	assert(gBlueLocation != 0xFFFFFFFF);
 
-	gShigeoMoonTransformsLoc = glGetUniformLocation(shaderProgram, "gModelToWorldTransform");
-	assert(gShigeoMoonTransformsLoc != 0xFFFFFFFF);
+
 
 
 	gWorldToViewToProjectionTransformLoc = glGetUniformLocation(shaderProgram, "gWorldToViewToProjectionTransform");
@@ -331,6 +486,11 @@ int main(int argc, char** argv)
 	}
 
 	buildShaders();
+	//define objects
+
+	Sun Saitama;
+	Planet Reigen, Shigeo;
+	Moon ReigenMoon, ShigeoMoon;
 
 	// Enable the z-buffer
 	glEnable(GL_DEPTH_TEST);
