@@ -41,6 +41,48 @@ GLuint gDirectionalLightDirectionLoc;
 // Materials uniform location
 GLuint gKaLoc;
 GLuint gKdLoc;
+class gameObject {
+	protected:
+		vec4 colour; 
+		GLuint VBO; 
+		mat4 transforms;
+	public:
+		void render() {
+
+		}
+		void update() {
+
+		}
+		void loadVertices(string path){
+
+
+		}
+		void scale(float x,float y,float z) {
+
+		}
+		void rotate(float angle, float x, float y, float z){
+
+
+		}
+		void translate(float x, float y, float z) {
+
+		}
+		mat4 getTransforms() {
+			return transforms;
+		}
+		void setTransfomrs(mat4 t) {
+			transforms = t;
+		}
+		void setColor(float r, float g, float b, float a) {
+			colour.r = r;
+			colour.g = g; 
+			colour.b = b; 
+			colour.a = a;
+		}
+};
+class chaser: public gameObject {
+
+};
 class Moon {
 private:
 	mat4 transforms;
