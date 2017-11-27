@@ -14,7 +14,7 @@ using namespace glm;
 
 const int windowWidth = 1024;
 const int windowHeight = 768;
-const int maxPlanets = 3; 
+const int maxPlanets = 3;
 
 
 // Transform uniforms location
@@ -40,134 +40,134 @@ GLuint gDirectionalLightDirectionLoc;
 GLuint gKaLoc;
 GLuint gKdLoc;
 class GameObject {
-	protected:
-		vec4 colour; 
-		GLuint VBO;
-		mat4 transforms;
-		int NUMVERTS;
-		vector<aitVertex> verts;
-	public:
-		
-		GameObject() {
-			transforms = mat4(1.0f);
-			NUMVERTS = 0;
-		}
+protected:
+	vec4 colour;
+	GLuint VBO;
+	mat4 transforms;
+	int NUMVERTS;
+	vector<aitVertex> verts;
+public:
 
-		void virtual render() {
-			glEnableVertexAttribArray(0);
-			glEnableVertexAttribArray(1);
-			glBindBuffer(GL_ARRAY_BUFFER, VBO);
-			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(aitVertex), 0);
-			glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(aitVertex), (const GLvoid*)12);
+	GameObject() {
+		transforms = mat4(1.0f);
+		NUMVERTS = 0;
+	}
 
-			glUniform1f(gRedLocation, colour.r);
-			glUniform1f(gGreenLocation, colour.g);
-			glUniform1f(gBlueLocation, colour.b);
-			glUniformMatrix4fv(gModelToWorldTransformLoc, 1, GL_FALSE, &transforms[0][0]);
-			glDrawArrays(GL_TRIANGLES, 0, NUMVERTS);
-			glDisableVertexAttribArray(0);
-			glDisableVertexAttribArray(1);
-		}
-		void virtual update() {
+	void virtual render() {
+		glEnableVertexAttribArray(0);
+		glEnableVertexAttribArray(1);
+		glBindBuffer(GL_ARRAY_BUFFER, VBO);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(aitVertex), 0);
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(aitVertex), (const GLvoid*)12);
 
-
-
-		}
-		void loadVertices(string path){
+		glUniform1f(gRedLocation, colour.r);
+		glUniform1f(gGreenLocation, colour.g);
+		glUniform1f(gBlueLocation, colour.b);
+		glUniformMatrix4fv(gModelToWorldTransformLoc, 1, GL_FALSE, &transforms[0][0]);
+		glDrawArrays(GL_TRIANGLES, 0, NUMVERTS);
+		glDisableVertexAttribArray(0);
+		glDisableVertexAttribArray(1);
+	}
+	void virtual update() {
 
 
-		}
-		void scaleOBJ(float x,float y,float z) {
 
-		}
-		void rotateOBJ(float angle, float x, float y, float z){
+	}
+	void loadVertices(string path) {
 
 
-		}
-		void translateOBJ(float x, float y, float z) {
+	}
+	void scaleOBJ(float x, float y, float z) {
 
-		}
-		
-		void createVertexBuffer(string path)
+	}
+	void rotateOBJ(float angle, float x, float y, float z) {
+
+
+	}
+	void translateOBJ(float x, float y, float z) {
+
+	}
+
+	void createVertexBuffer(string path)
+	{
+		aitMesh mesh1;
+
+		//if (!mesh1.loadFromObj("assets/sphere.obj"))
+		if (!mesh1.loadFromObj(path))
 		{
-			aitMesh mesh1;
+			cerr << "Error loading mesh from obj file." << endl;
+			system("pause");
+			exit(0);
+		}
+		verts = mesh1.getVertices();
 
-			//if (!mesh1.loadFromObj("assets/sphere.obj"))
-			if (!mesh1.loadFromObj(path))
-			{
-				cerr << "Error loading mesh from obj file." << endl;
-				system("pause");
-				exit(0);
-			}
-			verts = mesh1.getVertices();
+		NUMVERTS = verts.size();
 
-			NUMVERTS = verts.size();
-
-			glGenBuffers(1, &VBO);
-			glBindBuffer(GL_ARRAY_BUFFER, VBO);
-			glBufferData(GL_ARRAY_BUFFER, sizeof(aitVertex) * NUMVERTS, &verts[0], GL_STATIC_DRAW);
-		}
-		mat4 getTransforms() {
-			return transforms;
-		}
-		void setTransfomrs(mat4 t) {
-			transforms = t;
-		}
-		void setColor(float r, float g, float b, float a) {
-			colour.r = r;
-			colour.g = g; 
-			colour.b = b; 
-			colour.a = a;
-		}
+		glGenBuffers(1, &VBO);
+		glBindBuffer(GL_ARRAY_BUFFER, VBO);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(aitVertex) * NUMVERTS, &verts[0], GL_STATIC_DRAW);
+	}
+	mat4 getTransforms() {
+		return transforms;
+	}
+	void setTransfomrs(mat4 t) {
+		transforms = t;
+	}
+	void setColor(float r, float g, float b, float a) {
+		colour.r = r;
+		colour.g = g;
+		colour.b = b;
+		colour.a = a;
+	}
 };
 class Planet : public GameObject {
-	protected:
-		float orbitalSpeed;
-		float rotationSpeed;
-		float rotationAngle;
-		float orbitalAngle;
-	public: 
-		void render() override {
-			glEnableVertexAttribArray(0);
-			glEnableVertexAttribArray(1);
-			glBindBuffer(GL_ARRAY_BUFFER, VBO);
-			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(aitVertex), 0);
-			glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(aitVertex), (const GLvoid*)12);
+protected:
+	float orbitalSpeed;
+	float rotationSpeed;
+	float rotationAngle;
+	float orbitalAngle;
+public:
+	void render() override {
+		glEnableVertexAttribArray(0);
+		glEnableVertexAttribArray(1);
+		glBindBuffer(GL_ARRAY_BUFFER, VBO);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(aitVertex), 0);
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(aitVertex), (const GLvoid*)12);
 
-			glUniform1f(gRedLocation, colour.r);
-			glUniform1f(gGreenLocation, colour.g);
-			glUniform1f(gBlueLocation, colour.b);
-			glUniformMatrix4fv(gModelToWorldTransformLoc, 1, GL_FALSE, &transforms[0][0]);
-			glDrawArrays(GL_TRIANGLES, 0, NUMVERTS);
-			glDisableVertexAttribArray(0);
-			glDisableVertexAttribArray(1);
+		glUniform1f(gRedLocation, colour.r);
+		glUniform1f(gGreenLocation, colour.g);
+		glUniform1f(gBlueLocation, colour.b);
+		glUniformMatrix4fv(gModelToWorldTransformLoc, 1, GL_FALSE, &transforms[0][0]);
+		glDrawArrays(GL_TRIANGLES, 0, NUMVERTS);
+		glDisableVertexAttribArray(0);
+		glDisableVertexAttribArray(1);
 
-		}
-		void update() override {
-			rotationAngle += rotationSpeed;
-			orbitalAngle += orbitalSpeed;
-			transforms = rotate(transforms, orbitalAngle, vec3(0.0f, 0.5f, 0.0f));
+	}
+	void update() override {
+		rotationAngle += rotationSpeed;
+		orbitalAngle += orbitalSpeed;
+		transforms = rotate(transforms, orbitalAngle, vec3(0.0f, 0.5f, 0.0f));
 
-			transforms = rotate(transforms, 2.0f, vec3(0.0f, 1.0f, 0.0f));
+		transforms = rotate(transforms, 2.0f, vec3(0.0f, 1.0f, 0.0f));
 
-		}
+	}
 };
-class Chaser: public GameObject {
-	protected:
-		float speed; 
-		float turnSpeed; 
-		GameObject* objective;
-	public:
-		void render() {
-			glUniform1f(gRedLocation, colour.r);
-			glUniform1f(gGreenLocation, colour.g);
-			glUniform1f(gBlueLocation, colour.b);
-			glUniformMatrix4fv(gModelToWorldTransformLoc, 1, GL_FALSE, &transforms[0][0]);
-			glDrawArrays(GL_TRIANGLES, 0, NUMVERTS);
-		}
-		void update() {
+class Chaser : public GameObject {
+protected:
+	float speed;
+	float turnSpeed;
+	GameObject* objective;
+public:
+	void render() {
+		glUniform1f(gRedLocation, colour.r);
+		glUniform1f(gGreenLocation, colour.g);
+		glUniform1f(gBlueLocation, colour.b);
+		glUniformMatrix4fv(gModelToWorldTransformLoc, 1, GL_FALSE, &transforms[0][0]);
+		glDrawArrays(GL_TRIANGLES, 0, NUMVERTS);
+	}
+	void update() {
 
-		}
+	}
 };
 class Fleer : public GameObject {
 protected:
@@ -190,7 +190,7 @@ class wireframe : public GameObject {
 };
 
 GameObject objects[10];
-int objectsSize; 
+int objectsSize;
 static void render(GameObject GOarray[], int size) {
 
 	int i = 0;
@@ -202,7 +202,7 @@ static void render(GameObject GOarray[], int size) {
 
 
 static void update(GameObject GOarray[], int size) {
-	int i = 0; 
+	int i = 0;
 	for (i = 0; i < size; i++) {
 		GOarray[i].update();
 	}
@@ -228,8 +228,8 @@ static void renderSceneCallBack()
 
 	// Update the transforms in the shader program on the GPU
 	glUniformMatrix4fv(gWorldToViewToProjectionTransformLoc, 1, GL_FALSE, &worldToViewToProjectionTransform[0][0]);
-	
-	
+
+
 
 	// Set the material properties
 	glUniform1f(gKaLoc, 0.8f);
@@ -330,21 +330,21 @@ static void initializeGlutCallbacks()
 /*
 static void createVertexBuffer()
 {
-	aitMesh mesh1;
+aitMesh mesh1;
 
-	if (!mesh1.loadFromObj("assets/sphere.obj"))
-	{
-		cerr << "Error loading mesh from obj file." << endl;
-		system("pause");
-		exit(0);
-	}
-	vector<aitVertex> verts = mesh1.getVertices();
+if (!mesh1.loadFromObj("assets/sphere.obj"))
+{
+cerr << "Error loading mesh from obj file." << endl;
+system("pause");
+exit(0);
+}
+vector<aitVertex> verts = mesh1.getVertices();
 
-	NUMVERTS = verts.size();
+NUMVERTS = verts.size();
 
-	glGenBuffers(1, &VBO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(aitVertex) * NUMVERTS, &verts[0], GL_STATIC_DRAW);
+glGenBuffers(1, &VBO);
+glBindBuffer(GL_ARRAY_BUFFER, VBO);
+glBufferData(GL_ARRAY_BUFFER, sizeof(aitVertex) * NUMVERTS, &verts[0], GL_STATIC_DRAW);
 }
 */
 static void initLights()
@@ -461,14 +461,14 @@ static void buildShaders()
 
 	gShigeoMoonTransformsLoc = glGetUniformLocation(shaderProgram, "gModelToWorldTransform");
 	assert(gShigeoMoonTransformsLoc != 0xFFFFFFFF);
-	
+
 	gShigeoMoonTransformsLoc = glGetUniformLocation(shaderProgram, "gModelToWorldTransform");
 	assert(gShigeoMoonTransformsLoc != 0xFFFFFFFF);
 	*/
 	gRedLocation = glGetUniformLocation(shaderProgram, "red");
 	assert(gRedLocation != 0xFFFFFFFF);
 	gGreenLocation = glGetUniformLocation(shaderProgram, "green");
-	assert(gGreenLocation != 0xFFFFFFFF);	
+	assert(gGreenLocation != 0xFFFFFFFF);
 	gBlueLocation = glGetUniformLocation(shaderProgram, "blue");
 	assert(gBlueLocation != 0xFFFFFFFF);
 
@@ -500,11 +500,6 @@ int main(int argc, char** argv)
 	glutCreateWindow("obj Loader Test");
 
 	initializeGlutCallbacks();
-	//we create the objects
-	Planet Saitama = Planet();
-	Saitama.createVertexBuffer("assets/sphere.obj");
-	objects[objectsSize];
-	objectsSize++;
 
 	// Must be done after glut is initialized!
 	GLenum res = glewInit();
@@ -513,6 +508,13 @@ int main(int argc, char** argv)
 		cerr << "Error: " << glewGetErrorString(res) << "\n";
 		return 1;
 	}
+
+
+	//we create the objects
+	Planet Saitama = Planet();
+	Saitama.createVertexBuffer("assets/sphere.obj");
+	objects[objectsSize];
+	objectsSize++;
 
 	buildShaders();
 
