@@ -15,8 +15,6 @@ using namespace glm;
 const int windowWidth = 1024;
 const int windowHeight = 768;
 const int maxPlanets = 3; 
-GLuint VBO;
-int NUMVERTS = 0;
 
 
 // Transform uniforms location
@@ -41,31 +39,73 @@ GLuint gDirectionalLightDirectionLoc;
 // Materials uniform location
 GLuint gKaLoc;
 GLuint gKdLoc;
-class gameObject {
+class GameObject {
 	protected:
 		vec4 colour; 
-		GLuint VBO; 
+		GLuint VBO;
 		mat4 transforms;
+		int NUMVERTS;
+		vector<aitVertex> verts;
 	public:
-		void render() {
-
+		
+		GameObject() {
+			transforms = mat4(1.0f);
+			NUMVERTS = 0;
 		}
-		void update() {
+
+		void virtual render() {
+			glEnableVertexAttribArray(0);
+			glEnableVertexAttribArray(1);
+			glBindBuffer(GL_ARRAY_BUFFER, VBO);
+			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(aitVertex), 0);
+			glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(aitVertex), (const GLvoid*)12);
+
+			glUniform1f(gRedLocation, colour.r);
+			glUniform1f(gGreenLocation, colour.g);
+			glUniform1f(gBlueLocation, colour.b);
+			glUniformMatrix4fv(gModelToWorldTransformLoc, 1, GL_FALSE, &transforms[0][0]);
+			glDrawArrays(GL_TRIANGLES, 0, NUMVERTS);
+			glDisableVertexAttribArray(0);
+			glDisableVertexAttribArray(1);
+		}
+		void virtual update() {
+
+
 
 		}
 		void loadVertices(string path){
 
 
 		}
-		void scale(float x,float y,float z) {
+		void scaleOBJ(float x,float y,float z) {
 
 		}
-		void rotate(float angle, float x, float y, float z){
+		void rotateOBJ(float angle, float x, float y, float z){
 
 
 		}
-		void translate(float x, float y, float z) {
+		void translateOBJ(float x, float y, float z) {
 
+		}
+		
+		void createVertexBuffer(string path)
+		{
+			aitMesh mesh1;
+
+			//if (!mesh1.loadFromObj("assets/sphere.obj"))
+			if (!mesh1.loadFromObj(path))
+			{
+				cerr << "Error loading mesh from obj file." << endl;
+				system("pause");
+				exit(0);
+			}
+			verts = mesh1.getVertices();
+
+			NUMVERTS = verts.size();
+
+			glGenBuffers(1, &VBO);
+			glBindBuffer(GL_ARRAY_BUFFER, VBO);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(aitVertex) * NUMVERTS, &verts[0], GL_STATIC_DRAW);
 		}
 		mat4 getTransforms() {
 			return transforms;
@@ -80,261 +120,92 @@ class gameObject {
 			colour.a = a;
 		}
 };
-class chaser: public gameObject {
+class Planet : public GameObject {
+	protected:
+		float orbitalSpeed;
+		float rotationSpeed;
+		float rotationAngle;
+		float orbitalAngle;
+	public: 
+		void render() override {
+			glEnableVertexAttribArray(0);
+			glEnableVertexAttribArray(1);
+			glBindBuffer(GL_ARRAY_BUFFER, VBO);
+			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(aitVertex), 0);
+			glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(aitVertex), (const GLvoid*)12);
 
+			glUniform1f(gRedLocation, colour.r);
+			glUniform1f(gGreenLocation, colour.g);
+			glUniform1f(gBlueLocation, colour.b);
+			glUniformMatrix4fv(gModelToWorldTransformLoc, 1, GL_FALSE, &transforms[0][0]);
+			glDrawArrays(GL_TRIANGLES, 0, NUMVERTS);
+			glDisableVertexAttribArray(0);
+			glDisableVertexAttribArray(1);
+
+		}
+		void update() override {
+			rotationAngle += rotationSpeed;
+			orbitalAngle += orbitalSpeed;
+			transforms = rotate(transforms, orbitalAngle, vec3(0.0f, 0.5f, 0.0f));
+
+			transforms = rotate(transforms, 2.0f, vec3(0.0f, 1.0f, 0.0f));
+
+		}
 };
-class Moon {
-private:
-	mat4 transforms;
-	float red, blue, green, size, distance;
+class Chaser: public GameObject {
+	protected:
+		float speed; 
+		float turnSpeed; 
+		GameObject* objective;
+	public:
+		void render() {
+			glUniform1f(gRedLocation, colour.r);
+			glUniform1f(gGreenLocation, colour.g);
+			glUniform1f(gBlueLocation, colour.b);
+			glUniformMatrix4fv(gModelToWorldTransformLoc, 1, GL_FALSE, &transforms[0][0]);
+			glDrawArrays(GL_TRIANGLES, 0, NUMVERTS);
+		}
+		void update() {
+
+		}
+};
+class Fleer : public GameObject {
+protected:
 	float speed;
-	float angle;
+	float turnSpeed;
 public:
-	Moon() {
-		transforms = mat4(1.0f);
-		red = 1.0f;
-		blue = 1.0f;
-		green = 1.0f;
-		angle = 0.0f;
-		speed = 0.025f;
-		distance = 1.5f;
-		size = 0.2f;
-	}
-
-	void setColor(float r, float g, float b) {
-		red = r;
-		green = g;
-		blue = b;
-	}
-	mat4 rotateObj(float angle, float x, float y, float z) {
-		transforms = rotate(transforms, angle, vec3(0.0f, 0.5f, 0.0f));
-		return transforms;
-	}
-	mat4 scaleObj(float size) {
-		transforms = scale(transforms, vec3(size, size, size));
-		return transforms;
-
-	}
-	mat4 translateOBJ(float x, float y, float z) {
-		transforms = translate(transforms, vec3(x, y, z));
-		return transforms;
-	}
-	mat4 getTransforms() {
-		return transforms;
-	}
-	void setTransforms(mat4 trans) {
-		transforms = trans; 
-	}
-
-
-	void setSpeed(float s) {
-		speed = s;
-	}
-	float getSpeed() {
-		return speed;
-	}
-	void update() {
-		angle += speed;
-		transforms = rotate(transforms, angle, vec3(0.0f, 0.5f, 0.0f));
-		transforms = translate(transforms, vec3(distance, 0.0f, 0.0f));
-		transforms = rotate(transforms, angle, vec3(0.0f, 1.0f, 0.0f));
-
-		transforms = scale(transforms, vec3(size, size, size));
-	}
 	void render() {
-		glUniform1f(gRedLocation, red);
-		glUniform1f(gBlueLocation, blue);
-		glUniform1f(gGreenLocation, green);
+		glUniform1f(gRedLocation, colour.r);
+		glUniform1f(gGreenLocation, colour.g);
+		glUniform1f(gBlueLocation, colour.b);
 		glUniformMatrix4fv(gModelToWorldTransformLoc, 1, GL_FALSE, &transforms[0][0]);
 		glDrawArrays(GL_TRIANGLES, 0, NUMVERTS);
+	}
+	void update() {
 
 	}
 };
-class Planet {
-private:
-	mat4 transforms;
-	float red, blue, green, size, distance, angle, speed;
-	Moon moons[maxPlanets];
-	int moonsNumber;
+class wireframe : public GameObject {
 
-public:
-	Planet() {
-		transforms = mat4(1.0f);
-		red = 1.0f;
-		blue = 1.0f;
-		green = 1.0f;
-		angle = 0.0f;
-		speed = 0.0025f;
-		distance = 2.0f;
-		moonsNumber = 0;
-		size = 0.4f;
-	}
-
-	void addMoon(Moon moon) {
-		if (moonsNumber < maxPlanets) {
-			moons[moonsNumber] = moon;
-			moonsNumber++;
-			moon.setTransforms(transforms);
-
-		}
-	}
-	void setColor(float r, float g, float b) {
-		red = r;
-		green = g;
-		blue = b;
-	}
-	mat4 rotateObj(float angle, float x, float y, float z) {
-		transforms = rotate(transforms, angle, vec3(0.0f, 0.5f, 0.0f));
-		return transforms;
-	}
-	mat4 scaleObj(float size) {
-		transforms = scale(transforms, vec3(size, size, size));
-		return transforms;
-
-	}
-	mat4 translateOBJ(float x, float y, float z) {
-		transforms = translate(transforms, vec3(x, y, z));
-		return transforms;
-	}
-	mat4 getTransforms() {
-		return transforms;
-	}
-	void setTransforms(mat4 t) {
-		transforms = t;
-	}
-	void setDistance(float d) {
-		distance = d;
-	}
-	float getDistance() {
-		return distance;
-	}
-	void setSpeed(float s) {
-		speed = s;
-	}
-	float getSpeed() {
-		return speed;
-	}
-	void update() {
-		angle += speed;
-		transforms = rotate(transforms, angle, vec3(0.0f, 0.5f, 0.0f));
-		transforms = translate(transforms, vec3(distance, 0.0f, 0.0f));
-		transforms = rotate(transforms, 2.0f, vec3(0.0f, 1.0f, 0.0f));
-
-		transforms = scale(transforms, vec3(size, size, size));
-		for (int i = 0; i < moonsNumber; i++) {
-			
-			moons[i].setTransforms(transforms);
-
-			moons[i].update();
-		}
-	}
-	void render() {
-		glUniform1f(gRedLocation, red);
-		glUniform1f(gBlueLocation, blue);
-		glUniform1f(gGreenLocation, green);
-		glUniformMatrix4fv(gModelToWorldTransformLoc, 1, GL_FALSE, &transforms[0][0]);
-		glDrawArrays(GL_TRIANGLES, 0, NUMVERTS);
-		for (int i = 0; i < moonsNumber; i++) {
-			moons[i].render();
-		}
-	}
 };
 
+GameObject objects[10];
+int objectsSize; 
+static void render(GameObject GOarray[], int size) {
 
-class Sun {
-private:
-	mat4 transforms;
-	float red, blue, green, size, speed, angle;
-	Planet planets[3];
-	int planetsNumber;
+	int i = 0;
+	for (i = 0; i < size; i++) {
+		GOarray[i].render();
+	}
 
-public:
-	Sun(void) {
-		transforms = mat4(1.0f);
-		planetsNumber = 0;
-		red = 1.0f;
-		blue = 1.0f;
-		green = 1.0f;
-		speed = 0.025f;
-		size = 1.0f;
-	}
-	void addPlanet(Planet planet) {
-		if (planetsNumber < maxPlanets) {
-			if (planet.getDistance() == 0) {
-				planet.setDistance( 3.0f );
-			}
-
-			planets[planetsNumber] = planet;
-			planetsNumber++;
-
-		}
-	}
-	void setColor(float r, float g, float b) {
-		red = r;
-		green = g;
-		blue = b;
-	}
-	mat4 rotateObj(float angle, float x, float y, float z) {
-		transforms = rotate(transforms, angle, vec3(0.0f, 0.5f, 0.0f));
-		return transforms;
-	}
-	mat4 scaleObj(float size) {
-		transforms = scale(transforms, vec3(size, size, size));
-		return transforms;
-
-	}
-	mat4 translateOBJ(float x, float y, float z) {
-		transforms = translate(transforms, vec3(x, y, z));
-		return transforms;
-	}
-	mat4 getTransforms() {
-		return transforms;
-	}
-	void setSpeed(float s) {
-		speed = s;
-	}
-	float getSpeed() {
-		return speed;
-	}
-	void setAngle(float s) {
-		angle = s;
-	}
-	float getAngle() {
-		return angle;
-	}
-	void update() {
-		transforms = mat4(1.0f);
-		angle += speed;
-		transforms = rotate(transforms, angle, vec3(0.0f, 0.5f, 0.0f));
-		for (int i = 0; i < planetsNumber; i++) {
-			planets[i].setTransforms(transforms);
-			planets[i].update();
-		}
-
-	}
-	void render() {
-		glUniform1f(gRedLocation, red);
-		glUniform1f(gBlueLocation, blue);
-		glUniform1f(gGreenLocation, green);
-		glUniformMatrix4fv(gModelToWorldTransformLoc, 1, GL_FALSE, &transforms[0][0]);
-		glDrawArrays(GL_TRIANGLES, 0, NUMVERTS);
-		for (int i = 0; i < planetsNumber; i++) {
-			planets[i].render();
-		}
-	}
-};
-//global variable
-Sun Saitama = Sun();
-
-static void render() {
-	//IM MR MESEEKS LOOK AT ME!
-	Saitama.render();
 }
 
 
-static void update() {
-	//IM MR MESEEKS LOOK AT ME!
-	Saitama.update();
+static void update(GameObject GOarray[], int size) {
+	int i = 0; 
+	for (i = 0; i < size; i++) {
+		GOarray[i].update();
+	}
 
 }
 static void renderSceneCallBack()
@@ -357,20 +228,20 @@ static void renderSceneCallBack()
 
 	// Update the transforms in the shader program on the GPU
 	glUniformMatrix4fv(gWorldToViewToProjectionTransformLoc, 1, GL_FALSE, &worldToViewToProjectionTransform[0][0]);
-
-	glEnableVertexAttribArray(0);
-	glEnableVertexAttribArray(1);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(aitVertex), 0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(aitVertex), (const GLvoid*)12);
+	
+	
 
 	// Set the material properties
 	glUniform1f(gKaLoc, 0.8f);
 	glUniform1f(gKdLoc, 0.8f);
 
 	// Draw the model
-	update();
-	render();
+	//meter aqui el update y render
+	update(objects, objectsSize);
+	render(objects, objectsSize);
+
+
+
 	/*
 	mat4 modelToWorldTransform = mat4(1.0f);
 
@@ -445,10 +316,9 @@ static void renderSceneCallBack()
 	glUniformMatrix4fv(gShigeoMoonTransformsLoc, 1, GL_FALSE, &ShigeoMoonTransforms[0][0]);
 	glDrawArrays(GL_TRIANGLES, 0, NUMVERTS);
 
-
-	glDisableVertexAttribArray(0);
-	glDisableVertexAttribArray(1);
 	*/
+
+
 	glutSwapBuffers();
 }
 
@@ -457,7 +327,7 @@ static void initializeGlutCallbacks()
 	glutDisplayFunc(renderSceneCallBack);
 	glutIdleFunc(renderSceneCallBack);
 }
-
+/*
 static void createVertexBuffer()
 {
 	aitMesh mesh1;
@@ -476,7 +346,7 @@ static void createVertexBuffer()
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(aitVertex) * NUMVERTS, &verts[0], GL_STATIC_DRAW);
 }
-
+*/
 static void initLights()
 {
 	// Setup the ambient light
@@ -575,6 +445,8 @@ static void buildShaders()
 	//The frickin sun
 	gModelToWorldTransformLoc = glGetUniformLocation(shaderProgram, "gModelToWorldTransform");
 	assert(gModelToWorldTransformLoc != 0xFFFFFFFF);
+
+
 	/*
 	//Reigen and his moon
 	gReigenTransformsLoc = glGetUniformLocation(shaderProgram, "gModelToWorldTransform");
@@ -629,19 +501,10 @@ int main(int argc, char** argv)
 
 	initializeGlutCallbacks();
 	//we create the objects
-	Saitama.setColor(1.0f, 0.0f, 0.0f);
-	Planet Reigen = Planet();
-	Planet Shigeo = Planet();
-	Shigeo.setDistance(-4.0f);
-	Moon Ekubo = Moon();
-	Moon Ritsu = Moon();
-
-
-	Reigen.addMoon(Ekubo);
-	Shigeo.addMoon(Ritsu);
-
-	Saitama.addPlanet(Reigen);
-	Saitama.addPlanet(Shigeo);
+	Planet Saitama = Planet();
+	Saitama.createVertexBuffer("assets/sphere.obj");
+	objects[objectsSize];
+	objectsSize++;
 
 	// Must be done after glut is initialized!
 	GLenum res = glewInit();
@@ -669,7 +532,7 @@ int main(int argc, char** argv)
 	initLights();
 
 	// Create a vertex buffer
-	createVertexBuffer();
+	//createVertexBuffer();
 
 	glutMainLoop();
 
