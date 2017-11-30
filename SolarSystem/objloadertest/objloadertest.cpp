@@ -46,6 +46,7 @@ protected:
 	mat4 transforms;
 	int NUMVERTS;
 	vector<aitVertex> verts;
+	int type; //0 gameobject, 1 planet, 2 fleer, 3 chaser, 4 wireframe
 public:
 
 	GameObject() {
@@ -119,6 +120,9 @@ public:
 		colour.b = b;
 		colour.a = a;
 	}
+	int getType() {
+		return type;
+	}
 };
 class Planet : public GameObject {
 protected:
@@ -127,9 +131,16 @@ protected:
 	float rotationAngle;
 	float orbitalAngle;
 public:
+	Planet() {
+		type = 0;
+		orbitalSpeed = 0.25f;
+		rotationSpeed = 0.25f;
+		rotationAngle = 0; 
+		orbitalAngle = 0;
+
+	}
 	void render() override {
-		glEnableVertexAttribArray(0);
-		glEnableVertexAttribArray(1);
+
 		glBindBuffer(GL_ARRAY_BUFFER, VBO);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(aitVertex), 0);
 		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(aitVertex), (const GLvoid*)12);
@@ -139,8 +150,7 @@ public:
 		glUniform1f(gBlueLocation, colour.b);
 		glUniformMatrix4fv(gModelToWorldTransformLoc, 1, GL_FALSE, &transforms[0][0]);
 		glDrawArrays(GL_TRIANGLES, 0, NUMVERTS);
-		glDisableVertexAttribArray(0);
-		glDisableVertexAttribArray(1);
+
 
 	}
 	void update() override {
@@ -189,22 +199,26 @@ class wireframe : public GameObject {
 
 };
 
-GameObject objects[10];
-int objectsSize;
-static void render(GameObject GOarray[], int size) {
+
+
+GameObject* objects[10];
+int objectsSize = 0;
+
+
+static void render(GameObject* GOarray[], int size) {
 
 	int i = 0;
-	for (i = 0; i < size; i++) {
-		GOarray[i].render();
-	}
+	for (i = 0; i < size; i++) 
+			GOarray[i]->render();
+	
 
 }
 
 
-static void update(GameObject GOarray[], int size) {
+static void update(GameObject* GOarray[], int size) {
 	int i = 0;
 	for (i = 0; i < size; i++) {
-		GOarray[i].update();
+		GOarray[i]->update();
 	}
 
 }
@@ -229,95 +243,22 @@ static void renderSceneCallBack()
 	// Update the transforms in the shader program on the GPU
 	glUniformMatrix4fv(gWorldToViewToProjectionTransformLoc, 1, GL_FALSE, &worldToViewToProjectionTransform[0][0]);
 
+	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(1);
 
 
 	// Set the material properties
 	glUniform1f(gKaLoc, 0.8f);
 	glUniform1f(gKdLoc, 0.8f);
 
+
 	// Draw the model
 	//meter aqui el update y render
 	update(objects, objectsSize);
 	render(objects, objectsSize);
 
-
-
-	/*
-	mat4 modelToWorldTransform = mat4(1.0f);
-
-	mat4 ReigenTransforms = mat4(1.0f);
-	mat4 ReigenMoonTransforms = mat4(1.0f);
-	mat4 ShigeoTransforms = mat4(1.0f);
-	mat4 ShigeoMoonTransforms = mat4(1.0f);
-
-	float red = 0.9f;
-	float green = 0.9f;;
-	float blue = 0.0f;;
-	glUniform1f(gRedLocation , red);
-	glUniform1f(gBlueLocation, blue);
-	glUniform1f(gGreenLocation, green);
-
-
-
-
-
-
-	static float angleReigen = 0.0f;
-	angleReigen += 0.15f;
-
-	static float angleShigeo = 0.0f;
-	angleShigeo += 0.2f;
-	//reigen transforms
-	ReigenTransforms = rotate(ReigenTransforms, angleReigen, vec3(0.0f, 0.5f, 0.0f));
-	ReigenTransforms = translate(ReigenTransforms, vec3(2.0f, 0.0f, 0.0f));
-	ReigenTransforms = rotate(ReigenTransforms, 2.0f, vec3(0.0f, 1.0f, 0.0f));
-
-	ReigenTransforms = scale(ReigenTransforms, vec3(0.4, 0.4, 0.4));
-
-	ReigenMoonTransforms = ReigenTransforms;
-
-	ReigenMoonTransforms = rotate(ReigenMoonTransforms, angleReigen, vec3(0.0f, 0.5f, 0.0f));
-	ReigenMoonTransforms = translate(ReigenMoonTransforms, vec3(2.0f, 0.0f, 0.0f));
-	ReigenMoonTransforms = scale(ReigenMoonTransforms, vec3(0.4, 0.4, 0.4));
-	//shigeo transforms
-	ShigeoTransforms = rotate(ShigeoTransforms, angleShigeo, vec3(0.0f, 1.0f, 0.0f));
-	ShigeoTransforms = translate(ShigeoTransforms, vec3(-4.0f, 0.0f, 0.0f));
-	ShigeoTransforms = scale(ShigeoTransforms, vec3(0.4, 0.4, 0.4));
-
-	ShigeoMoonTransforms = ShigeoTransforms;
-
-	ShigeoMoonTransforms = rotate(ShigeoMoonTransforms, angleShigeo, vec3(0.0f, 1.0f, 0.0f));
-	ShigeoMoonTransforms = translate(ShigeoMoonTransforms, vec3(2.0f, 0.0f, 0.0f));
-	ShigeoMoonTransforms = scale(ShigeoMoonTransforms, vec3(0.4, 0.4, 0.4));
-
-
-	modelToWorldTransform = rotate(modelToWorldTransform, angleReigen, vec3(0.0f, 1.0f, 0.0f));
-
-	glUniformMatrix4fv(gModelToWorldTransformLoc, 1, GL_FALSE, &modelToWorldTransform[0][0]);
-	glDrawArrays(GL_TRIANGLES, 0, NUMVERTS);
-	//reigen
-	glUniform1f(gRedLocation, 0.0f);
-	glUniform1f(gBlueLocation, 1.0f);
-	glUniform1f(gGreenLocation, 0.2f);
-	glUniformMatrix4fv(gReigenTransformsLoc, 1, GL_FALSE, &ReigenTransforms[0][0]);
-	glDrawArrays(GL_TRIANGLES, 0, NUMVERTS);
-
-	glUniformMatrix4fv(gReigenMoonTransformsLoc, 1, GL_FALSE, &ReigenMoonTransforms[0][0]);
-	glDrawArrays(GL_TRIANGLES, 0, NUMVERTS);
-
-
-	//shigeo
-	glUniform1f(gRedLocation, 1.0f);
-	glUniform1f(gBlueLocation, 0.3f);
-	glUniform1f(gGreenLocation, 0.2f);
-	glUniformMatrix4fv(gShigeoTransformsLoc, 1, GL_FALSE, &ShigeoTransforms[0][0]);
-	glDrawArrays(GL_TRIANGLES, 0, NUMVERTS);
-
-	glUniformMatrix4fv(gShigeoMoonTransformsLoc, 1, GL_FALSE, &ShigeoMoonTransforms[0][0]);
-	glDrawArrays(GL_TRIANGLES, 0, NUMVERTS);
-
-	*/
-
+	glDisableVertexAttribArray(0);
+	glDisableVertexAttribArray(1);
 
 	glutSwapBuffers();
 }
@@ -511,9 +452,9 @@ int main(int argc, char** argv)
 
 
 	//we create the objects
-	Planet Saitama = Planet();
-	Saitama.createVertexBuffer("assets/sphere.obj");
-	objects[objectsSize];
+	Planet* Saitama = new Planet();
+	Saitama->createVertexBuffer("assets/sphere.obj");
+	objects[objectsSize] = Saitama;
 	objectsSize++;
 
 	buildShaders();
@@ -537,6 +478,9 @@ int main(int argc, char** argv)
 	//createVertexBuffer();
 
 	glutMainLoop();
+
+	// delete stuff!!!
+
 
 	return 0;
 }
