@@ -39,6 +39,9 @@ GLuint gDirectionalLightDirectionLoc;
 // Materials uniform location
 GLuint gKaLoc;
 GLuint gKdLoc;
+
+
+
 class GameObject {
 protected:
 	vec4 colour;
@@ -52,6 +55,9 @@ public:
 	GameObject() {
 		transforms = mat4(1.0f);
 		NUMVERTS = 0;
+		colour.r = 0.4f;
+		colour.g = 0.4f;
+		colour.b = 0.4f;
 	}
 
 	void virtual render() {
@@ -86,7 +92,7 @@ public:
 
 	}
 	void translateOBJ(float x, float y, float z) {
-
+		transforms = translate(transforms, vec3(x, y, z));
 	}
 
 	void createVertexBuffer(string path)
@@ -167,6 +173,7 @@ protected:
 	float speed;
 	float turnSpeed;
 	GameObject* objective;
+	
 public:
 	void render() {
 		glUniform1f(gRedLocation, colour.r);
@@ -174,6 +181,7 @@ public:
 		glUniform1f(gBlueLocation, colour.b);
 		glUniformMatrix4fv(gModelToWorldTransformLoc, 1, GL_FALSE, &transforms[0][0]);
 		glDrawArrays(GL_TRIANGLES, 0, NUMVERTS);
+
 	}
 	void update() {
 
@@ -183,7 +191,14 @@ class Fleer : public GameObject {
 protected:
 	float speed;
 	float turnSpeed;
+	float movex, movey, movez;
+
 public:
+	Fleer() {
+		movex = 0;
+		movey = 0;
+		movez = 0;
+	}
 	void render() {
 		glUniform1f(gRedLocation, colour.r);
 		glUniform1f(gGreenLocation, colour.g);
@@ -192,7 +207,15 @@ public:
 		glDrawArrays(GL_TRIANGLES, 0, NUMVERTS);
 	}
 	void update() {
-
+		transforms = translate(transforms, vec3(movex, movey, movez));
+		movex = 0;
+		movey = 0;
+		movez = 0;
+	}
+	void move(int x,int y,int z) {
+		movex = x;
+		movey = y;
+		movez = z;
 	}
 };
 class wireframe : public GameObject {
@@ -203,6 +226,23 @@ class wireframe : public GameObject {
 
 GameObject* objects[10];
 int objectsSize = 0;
+
+void keyPressed(unsigned char key, int x, int y) {
+	if (key == 'w') {
+		objects[1]->translateOBJ(0.0f, 0.1f, 0.0f);
+	}
+	if (key == 's') {
+		objects[1]->translateOBJ(0.0f, -0.1f, 0.0f);
+	}
+	if (key == 'd') {
+		objects[1]->translateOBJ(0.1f, 0.0f, 0.0f);
+	}
+	if (key == 'a') {
+		objects[1]->translateOBJ(-0.1f, 0.0f, 0.0f);
+	}
+}
+
+
 
 
 static void render(GameObject* GOarray[], int size) {
@@ -267,6 +307,7 @@ static void initializeGlutCallbacks()
 {
 	glutDisplayFunc(renderSceneCallBack);
 	glutIdleFunc(renderSceneCallBack);
+	glutKeyboardFunc(keyPressed);
 }
 /*
 static void createVertexBuffer()
@@ -347,6 +388,7 @@ const string readFileToString(const char* filename)
 static void buildShaders()
 {
 	GLuint shaderProgram = glCreateProgram();
+	glutSetKeyRepeat(GLUT_KEY_REPEAT_ON);
 
 	if (shaderProgram == 0)
 	{
@@ -407,11 +449,11 @@ static void buildShaders()
 	assert(gShigeoMoonTransformsLoc != 0xFFFFFFFF);
 	*/
 	gRedLocation = glGetUniformLocation(shaderProgram, "red");
-	assert(gRedLocation != 0xFFFFFFFF);
+	//assert(gRedLocation != 0xFFFFFFFF);
 	gGreenLocation = glGetUniformLocation(shaderProgram, "green");
-	assert(gGreenLocation != 0xFFFFFFFF);
+	//assert(gGreenLocation != 0xFFFFFFFF);
 	gBlueLocation = glGetUniformLocation(shaderProgram, "blue");
-	assert(gBlueLocation != 0xFFFFFFFF);
+	//assert(gBlueLocation != 0xFFFFFFFF);
 
 
 
@@ -419,15 +461,15 @@ static void buildShaders()
 	gWorldToViewToProjectionTransformLoc = glGetUniformLocation(shaderProgram, "gWorldToViewToProjectionTransform");
 	assert(gWorldToViewToProjectionTransformLoc != 0xFFFFFFFF);
 	gAmbientLightIntensityLoc = glGetUniformLocation(shaderProgram, "gAmbientLightIntensity");
-	assert(gAmbientLightIntensityLoc != 0xFFFFFFFF);
+//	assert(gAmbientLightIntensityLoc != 0xFFFFFFFF);
 	gDirectionalLightIntensityLoc = glGetUniformLocation(shaderProgram, "gDirectionalLightIntensity");
-	assert(gDirectionalLightIntensityLoc != 0xFFFFFFFF);
+//	assert(gDirectionalLightIntensityLoc != 0xFFFFFFFF);
 	gDirectionalLightDirectionLoc = glGetUniformLocation(shaderProgram, "gDirectionalLightDirection");
-	assert(gDirectionalLightDirectionLoc != 0xFFFFFFFF);
+//  assert(gDirectionalLightDirectionLoc != 0xFFFFFFFF);
 	gKaLoc = glGetUniformLocation(shaderProgram, "gKa");
-	assert(gDirectionalLightDirectionLoc != 0xFFFFFFFF);
+//	assert(gDirectionalLightDirectionLoc != 0xFFFFFFFF);
 	gKdLoc = glGetUniformLocation(shaderProgram, "gKd");
-	assert(gDirectionalLightDirectionLoc != 0xFFFFFFFF);
+//	assert(gDirectionalLightDirectionLoc != 0xFFFFFFFF);
 }
 
 
@@ -456,7 +498,12 @@ int main(int argc, char** argv)
 	Saitama->createVertexBuffer("assets/sphere.obj");
 	objects[objectsSize] = Saitama;
 	objectsSize++;
+	Fleer* Ribbit = new Fleer();
+	Ribbit->createVertexBuffer("assets/bunny.obj");
 
+	objects[objectsSize] = Ribbit;
+
+	objectsSize++;
 	buildShaders();
 
 
