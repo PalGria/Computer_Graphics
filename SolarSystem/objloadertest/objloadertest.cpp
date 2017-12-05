@@ -85,7 +85,7 @@ public:
 
 	}
 	void scaleOBJ(float x, float y, float z) {
-
+		transforms = scale(transforms, vec3(x, y, z));
 	}
 	void rotateOBJ(float angle, float x, float y, float z) {
 
@@ -162,12 +162,69 @@ public:
 	void update() override {
 		rotationAngle += rotationSpeed;
 		orbitalAngle += orbitalSpeed;
-		transforms = rotate(transforms, orbitalAngle, vec3(0.0f, 0.5f, 0.0f));
+		transforms = rotate(transforms, orbitalSpeed, vec3(0.0f, 0.5f, 0.0f));
 
-		transforms = rotate(transforms, 2.0f, vec3(0.0f, 1.0f, 0.0f));
+		transforms = rotate(transforms, rotationSpeed, vec3(0.0f, 1.0f, 0.0f));
 
 	}
 };
+
+class Moon : public GameObject {
+protected:
+	float orbitalSpeed;
+	float rotationSpeed;
+	float rotationAngle;
+	float orbitalAngle;
+	float distance;
+	float size;
+	GameObject* parent;
+public:
+	Moon(GameObject* par) {
+		parent = par;
+		type = 5;
+		orbitalSpeed = 0.000000025f;
+		rotationSpeed = 0.00000025f;
+		rotationAngle = 0;
+		orbitalAngle = 0;
+		distance = 4.5;
+		transforms = parent->getTransforms();
+		size = 0.4;
+	}
+	void render() override {
+
+		glBindBuffer(GL_ARRAY_BUFFER, VBO);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(aitVertex), 0);
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(aitVertex), (const GLvoid*)12);
+
+		glUniform1f(gRedLocation, colour.r);
+		glUniform1f(gGreenLocation, colour.g);
+		glUniform1f(gBlueLocation, colour.b);
+		glUniformMatrix4fv(gModelToWorldTransformLoc, 1, GL_FALSE, &transforms[0][0]);
+		glDrawArrays(GL_TRIANGLES, 0, NUMVERTS);
+
+
+	}
+	void update() override {
+
+		transforms = parent->getTransforms();
+
+		rotationAngle += rotationSpeed;
+		orbitalAngle += orbitalSpeed;
+
+		transforms = scale(transforms, vec3(size, size, size));
+
+		transforms = rotate(transforms, rotationAngle, vec3(0.0f, 1.0f, 0.0f));
+		transforms = translate(transforms, vec3(distance, 0.0f, 0.0f));
+		transforms = rotate(transforms, orbitalAngle, vec3(0.0f, 1.0f, 0.0f));
+
+	}
+	void setSize(float s) {
+		size = s;
+	}
+};
+
+
+
 class Chaser : public GameObject {
 protected:
 	float speed;
@@ -175,6 +232,11 @@ protected:
 	GameObject* objective;
 	
 public:
+	void setObjective(GameObject* o) {
+		objective = o;
+		speed = 0.001f;
+	}
+
 	void render() {
 		glUniform1f(gRedLocation, colour.r);
 		glUniform1f(gGreenLocation, colour.g);
@@ -184,6 +246,31 @@ public:
 
 	}
 	void update() {
+		mat4 t = objective->getTransforms();
+		float xObj = t[3].x;
+		float yObj = t[3].y;
+
+		float xChaser = transforms[3].x;
+		float yChaser = transforms[3].y;
+
+		float newx, newy; 
+
+		if (xObj > xChaser) {
+			transforms = translate(transforms, vec3(speed, 0.0f, 0.0f));
+		}
+		else {
+			transforms = translate(transforms, vec3(-speed, 0.0f, 0.0f));
+
+		}
+		if (yObj > yChaser) {
+			transforms = translate(transforms, vec3(0.0f, speed, 0.0f));
+
+		}
+		else {
+			transforms = translate(transforms, vec3(0.0f, -speed, 0.0f));
+
+		}
+
 
 	}
 };
@@ -229,17 +316,19 @@ int objectsSize = 0;
 
 void keyPressed(unsigned char key, int x, int y) {
 	if (key == 'w') {
-		objects[1]->translateOBJ(0.0f, 0.1f, 0.0f);
+		objects[1]->translateOBJ(0.0f, 0.5f, 0.0f);
 	}
 	if (key == 's') {
-		objects[1]->translateOBJ(0.0f, -0.1f, 0.0f);
+		objects[1]->translateOBJ(0.0f, -0.5f, 0.0f);
 	}
 	if (key == 'd') {
-		objects[1]->translateOBJ(0.1f, 0.0f, 0.0f);
+		objects[1]->translateOBJ(0.5f, 0.0f, 0.0f);
 	}
 	if (key == 'a') {
-		objects[1]->translateOBJ(-0.1f, 0.0f, 0.0f);
+		objects[1]->translateOBJ(-0.5f, 0.0f, 0.0f);
 	}
+	mat4 t = objects[1]->getTransforms();
+	cout <<" X " << t[3].x << " Y " << t[3].y <<  "\n";
 }
 
 
@@ -495,15 +584,38 @@ int main(int argc, char** argv)
 
 	//we create the objects
 	Planet* Saitama = new Planet();
+	Saitama->setColor(0.0f, 1.0f, 0.4f, 1.0f);
 	Saitama->createVertexBuffer("assets/sphere.obj");
+	Saitama->scaleOBJ(0.7f, 0.7f, 0.7f);
 	objects[objectsSize] = Saitama;
 	objectsSize++;
 	Fleer* Ribbit = new Fleer();
-	Ribbit->createVertexBuffer("assets/bunny.obj");
-
+	Ribbit->createVertexBuffer("assets/sphere.obj");
+	Ribbit->scaleOBJ(0.3, 0.3, 0.3);
+	Ribbit->setColor(0.5f, 0.5f, 1.0f, 1.0f);
+	Ribbit->translateOBJ(-5.0f, 3.0f, 5.0f);
 	objects[objectsSize] = Ribbit;
 
 	objectsSize++;
+
+	Chaser* Chad = new Chaser();
+	Chad->createVertexBuffer("assets/sphere.obj");
+	Chad->setObjective(Ribbit);
+	objects[objectsSize] = Chad;
+	Chad->scaleOBJ(0.4f, 0.4f, 0.4f);
+	Chad->setColor(1.0f, 0.5f, 0.5f, 1.0f);
+	Chad->translateOBJ(-10.0f, -3.0f, 5.0f);
+
+	objectsSize++;
+
+	Moon* Shigeo = new Moon(Saitama);
+	Shigeo->createVertexBuffer("assets/sphere.obj");
+	objects[objectsSize] = Shigeo;
+	Shigeo->setSize(0.3f);
+	objectsSize++;
+
+
+
 	buildShaders();
 
 
