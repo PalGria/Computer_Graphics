@@ -5,7 +5,7 @@ c:\users\jose\documents\github\objloader_cg\solarsystem\objloadertest\objloadert
 c:\users\jose\documents\github\objloader_cg\solarsystem\objloadertest\objloadertest.cpp(303): warning C4244: '=': conversión de 'int' a 'float'; posible pérdida de datos
 c:\users\jose\documents\github\objloader_cg\solarsystem\objloadertest\objloadertest.cpp(304): warning C4244: '=': conversión de 'int' a 'float'; posible pérdida de datos
 c:\users\jose\documents\github\objloader_cg\solarsystem\objloadertest\objloadertest.cpp(305): warning C4244: '=': conversión de 'int' a 'float'; posible pérdida de datos
-c:\users\jose\documents\github\objloader_cg\solarsystem\objloadertest\objloadertest.cpp(594): warning C4305: 'argumento': truncamiento de 'double' a 'float'
+c:\users\jose\documents\github\objloader_cg\solarsystem\objloadertest\objloadertest.cpp(558): warning C4305: 'argumento': truncamiento de 'double' a 'float'
   GLM: rotate function taking degrees as a parameter is deprecated. #define GLM_FORCE_RADIANS before including GLM headers to remove this message.
   GLM: perspective function taking degrees as a parameter is deprecated. #define GLM_FORCE_RADIANS before including GLM headers to remove this message.
   objloadertest.vcxproj -> C:\Users\Jose\Documents\GitHub\ObjLoader_CG\SolarSystem\objloadertest\Debug\objloadertest.exe

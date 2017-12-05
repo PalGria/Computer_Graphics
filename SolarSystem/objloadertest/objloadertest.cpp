@@ -398,26 +398,7 @@ static void initializeGlutCallbacks()
 	glutIdleFunc(renderSceneCallBack);
 	glutKeyboardFunc(keyPressed);
 }
-/*
-static void createVertexBuffer()
-{
-aitMesh mesh1;
 
-if (!mesh1.loadFromObj("assets/sphere.obj"))
-{
-cerr << "Error loading mesh from obj file." << endl;
-system("pause");
-exit(0);
-}
-vector<aitVertex> verts = mesh1.getVertices();
-
-NUMVERTS = verts.size();
-
-glGenBuffers(1, &VBO);
-glBindBuffer(GL_ARRAY_BUFFER, VBO);
-glBufferData(GL_ARRAY_BUFFER, sizeof(aitVertex) * NUMVERTS, &verts[0], GL_STATIC_DRAW);
-}
-*/
 static void initLights()
 {
 	// Setup the ambient light
@@ -519,30 +500,13 @@ static void buildShaders()
 	assert(gModelToWorldTransformLoc != 0xFFFFFFFF);
 
 
-	/*
-	//Reigen and his moon
-	gReigenTransformsLoc = glGetUniformLocation(shaderProgram, "gModelToWorldTransform");
-	assert(gModelToWorldTransformLoc != 0xFFFFFFFF);
 
-	gReigenMoonTransformsLoc = glGetUniformLocation(shaderProgram, "gModelToWorldTransform");
-	assert(gReigenMoonTransformsLoc != 0xFFFFFFFF);
-
-	//Shigeo and his moon
-	gShigeoTransformsLoc = glGetUniformLocation(shaderProgram, "gModelToWorldTransform");
-	assert(gShigeoTransformsLoc != 0xFFFFFFFF);
-
-	gShigeoMoonTransformsLoc = glGetUniformLocation(shaderProgram, "gModelToWorldTransform");
-	assert(gShigeoMoonTransformsLoc != 0xFFFFFFFF);
-
-	gShigeoMoonTransformsLoc = glGetUniformLocation(shaderProgram, "gModelToWorldTransform");
-	assert(gShigeoMoonTransformsLoc != 0xFFFFFFFF);
-	*/
 	gRedLocation = glGetUniformLocation(shaderProgram, "red");
-	//assert(gRedLocation != 0xFFFFFFFF);
+	assert(gRedLocation != 0xFFFFFFFF);
 	gGreenLocation = glGetUniformLocation(shaderProgram, "green");
-	//assert(gGreenLocation != 0xFFFFFFFF);
+	assert(gGreenLocation != 0xFFFFFFFF);
 	gBlueLocation = glGetUniformLocation(shaderProgram, "blue");
-	//assert(gBlueLocation != 0xFFFFFFFF);
+	assert(gBlueLocation != 0xFFFFFFFF);
 
 
 
@@ -550,15 +514,15 @@ static void buildShaders()
 	gWorldToViewToProjectionTransformLoc = glGetUniformLocation(shaderProgram, "gWorldToViewToProjectionTransform");
 	assert(gWorldToViewToProjectionTransformLoc != 0xFFFFFFFF);
 	gAmbientLightIntensityLoc = glGetUniformLocation(shaderProgram, "gAmbientLightIntensity");
-//	assert(gAmbientLightIntensityLoc != 0xFFFFFFFF);
+	assert(gAmbientLightIntensityLoc != 0xFFFFFFFF);
 	gDirectionalLightIntensityLoc = glGetUniformLocation(shaderProgram, "gDirectionalLightIntensity");
-//	assert(gDirectionalLightIntensityLoc != 0xFFFFFFFF);
+	assert(gDirectionalLightIntensityLoc != 0xFFFFFFFF);
 	gDirectionalLightDirectionLoc = glGetUniformLocation(shaderProgram, "gDirectionalLightDirection");
-//  assert(gDirectionalLightDirectionLoc != 0xFFFFFFFF);
+	assert(gDirectionalLightDirectionLoc != 0xFFFFFFFF);
 	gKaLoc = glGetUniformLocation(shaderProgram, "gKa");
-//	assert(gDirectionalLightDirectionLoc != 0xFFFFFFFF);
+	assert(gDirectionalLightDirectionLoc != 0xFFFFFFFF);
 	gKdLoc = glGetUniformLocation(shaderProgram, "gKd");
-//	assert(gDirectionalLightDirectionLoc != 0xFFFFFFFF);
+	assert(gDirectionalLightDirectionLoc != 0xFFFFFFFF);
 }
 
 
