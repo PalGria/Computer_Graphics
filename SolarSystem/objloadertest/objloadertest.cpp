@@ -305,9 +305,6 @@ public:
 		movez = z;
 	}
 };
-class wireframe : public GameObject {
-
-};
 
 
 
