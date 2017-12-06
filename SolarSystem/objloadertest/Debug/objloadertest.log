@@ -1,11 +1,12 @@
 ﻿  objloadertest.cpp
-c:\users\jose\documents\github\objloader_cg\solarsystem\objloadertest\objloadertest.cpp(191): warning C4305: '=': truncamiento de 'double' a 'float'
-c:\users\jose\documents\github\objloader_cg\solarsystem\objloadertest\objloadertest.cpp(256): warning C4101: 'newx': variable local sin referencia
-c:\users\jose\documents\github\objloader_cg\solarsystem\objloadertest\objloadertest.cpp(256): warning C4101: 'newy': variable local sin referencia
-c:\users\jose\documents\github\objloader_cg\solarsystem\objloadertest\objloadertest.cpp(303): warning C4244: '=': conversión de 'int' a 'float'; posible pérdida de datos
-c:\users\jose\documents\github\objloader_cg\solarsystem\objloadertest\objloadertest.cpp(304): warning C4244: '=': conversión de 'int' a 'float'; posible pérdida de datos
-c:\users\jose\documents\github\objloader_cg\solarsystem\objloadertest\objloadertest.cpp(305): warning C4244: '=': conversión de 'int' a 'float'; posible pérdida de datos
-c:\users\jose\documents\github\objloader_cg\solarsystem\objloadertest\objloadertest.cpp(558): warning C4305: 'argumento': truncamiento de 'double' a 'float'
+c:\users\jose\documents\github\objloader_cg\solarsystem\objloadertest\objloadertest.cpp(86): warning C4102: 'case3': etiqueta sin referencia
+c:\users\jose\documents\github\objloader_cg\solarsystem\objloadertest\objloadertest.cpp(227): warning C4305: '=': truncamiento de 'double' a 'float'
+c:\users\jose\documents\github\objloader_cg\solarsystem\objloadertest\objloadertest.cpp(324): warning C4101: 'newx': variable local sin referencia
+c:\users\jose\documents\github\objloader_cg\solarsystem\objloadertest\objloadertest.cpp(324): warning C4101: 'newy': variable local sin referencia
+c:\users\jose\documents\github\objloader_cg\solarsystem\objloadertest\objloadertest.cpp(388): warning C4244: '=': conversión de 'int' a 'float'; posible pérdida de datos
+c:\users\jose\documents\github\objloader_cg\solarsystem\objloadertest\objloadertest.cpp(389): warning C4244: '=': conversión de 'int' a 'float'; posible pérdida de datos
+c:\users\jose\documents\github\objloader_cg\solarsystem\objloadertest\objloadertest.cpp(390): warning C4244: '=': conversión de 'int' a 'float'; posible pérdida de datos
+c:\users\jose\documents\github\objloader_cg\solarsystem\objloadertest\objloadertest.cpp(662): warning C4305: 'argumento': truncamiento de 'double' a 'float'
   GLM: rotate function taking degrees as a parameter is deprecated. #define GLM_FORCE_RADIANS before including GLM headers to remove this message.
   GLM: perspective function taking degrees as a parameter is deprecated. #define GLM_FORCE_RADIANS before including GLM headers to remove this message.
   objloadertest.vcxproj -> C:\Users\Jose\Documents\GitHub\ObjLoader_CG\SolarSystem\objloadertest\Debug\objloadertest.exe

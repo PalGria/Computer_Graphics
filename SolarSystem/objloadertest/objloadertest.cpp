@@ -49,7 +49,7 @@ protected:
 	mat4 transforms;
 	int NUMVERTS;
 	vector<aitVertex> verts;
-	int type; //0 gameobject, 1 planet, 2 fleer, 3 chaser, 4 wireframe
+	int mode; //0 GL_TRIANGLES, 1 GL_POINTS, 2 GL_LINE_STRIP, 3 GL_LINES
 public:
 
 	GameObject() {
@@ -58,6 +58,7 @@ public:
 		colour.r = 0.4f;
 		colour.g = 0.4f;
 		colour.b = 0.4f;
+		mode = 0;
 	}
 
 	void virtual render() {
@@ -71,9 +72,32 @@ public:
 		glUniform1f(gGreenLocation, colour.g);
 		glUniform1f(gBlueLocation, colour.b);
 		glUniformMatrix4fv(gModelToWorldTransformLoc, 1, GL_FALSE, &transforms[0][0]);
-		glDrawArrays(GL_TRIANGLES, 0, NUMVERTS);
+
+		switch (mode) {
+			case 0:
+				glDrawArrays(GL_TRIANGLES, 0, NUMVERTS);
+				break;
+			case 1:
+				glDrawArrays(GL_POINTS, 0, NUMVERTS);
+				break;
+			case 2:
+				glDrawArrays(GL_LINE_STRIP, 0, NUMVERTS);
+				break;
+			case3:
+				glDrawArrays(GL_LINES, 0, NUMVERTS);
+				break;
+			default:
+				glDrawArrays(GL_TRIANGLES, 0, NUMVERTS);
+				break;
+
+		}
+
+
 		glDisableVertexAttribArray(0);
 		glDisableVertexAttribArray(1);
+	}
+	void setMode(int m) {
+		mode = m;
 	}
 	void virtual update() {
 
@@ -126,9 +150,7 @@ public:
 		colour.b = b;
 		colour.a = a;
 	}
-	int getType() {
-		return type;
-	}
+
 };
 class Planet : public GameObject {
 protected:
@@ -138,7 +160,6 @@ protected:
 	float orbitalAngle;
 public:
 	Planet() {
-		type = 0;
 		orbitalSpeed = 0.25f;
 		rotationSpeed = 0.25f;
 		rotationAngle = 0; 
@@ -155,8 +176,24 @@ public:
 		glUniform1f(gGreenLocation, colour.g);
 		glUniform1f(gBlueLocation, colour.b);
 		glUniformMatrix4fv(gModelToWorldTransformLoc, 1, GL_FALSE, &transforms[0][0]);
-		glDrawArrays(GL_TRIANGLES, 0, NUMVERTS);
+		switch (mode) {
+		case 0:
+			glDrawArrays(GL_TRIANGLES, 0, NUMVERTS);
+			break;
+		case 1:
+			glDrawArrays(GL_POINTS, 0, NUMVERTS);
+			break;
+		case 2:
+			glDrawArrays(GL_LINE_STRIP, 0, NUMVERTS);
+			break;
+		case 3:
+			glDrawArrays(GL_LINES, 0, NUMVERTS);
+			break;
+		default:
+			glDrawArrays(GL_TRIANGLES, 0, NUMVERTS);
+			break;
 
+		}
 
 	}
 	void update() override {
@@ -181,7 +218,6 @@ protected:
 public:
 	Moon(GameObject* par) {
 		parent = par;
-		type = 5;
 		orbitalSpeed = 0.000000025f;
 		rotationSpeed = 0.00000025f;
 		rotationAngle = 0;
@@ -200,8 +236,24 @@ public:
 		glUniform1f(gGreenLocation, colour.g);
 		glUniform1f(gBlueLocation, colour.b);
 		glUniformMatrix4fv(gModelToWorldTransformLoc, 1, GL_FALSE, &transforms[0][0]);
-		glDrawArrays(GL_TRIANGLES, 0, NUMVERTS);
+		switch (mode) {
+		case 0:
+			glDrawArrays(GL_TRIANGLES, 0, NUMVERTS);
+			break;
+		case 1:
+			glDrawArrays(GL_POINTS, 0, NUMVERTS);
+			break;
+		case 2:
+			glDrawArrays(GL_LINE_STRIP, 0, NUMVERTS);
+			break;
+		case 3:
+			glDrawArrays(GL_LINES, 0, NUMVERTS);
+			break;
+		default:
+			glDrawArrays(GL_TRIANGLES, 0, NUMVERTS);
+			break;
 
+		}
 
 	}
 	void update() override {
@@ -242,8 +294,24 @@ public:
 		glUniform1f(gGreenLocation, colour.g);
 		glUniform1f(gBlueLocation, colour.b);
 		glUniformMatrix4fv(gModelToWorldTransformLoc, 1, GL_FALSE, &transforms[0][0]);
-		glDrawArrays(GL_TRIANGLES, 0, NUMVERTS);
+		switch (mode) {
+		case 0:
+			glDrawArrays(GL_TRIANGLES, 0, NUMVERTS);
+			break;
+		case 1:
+			glDrawArrays(GL_POINTS, 0, NUMVERTS);
+			break;
+		case 2:
+			glDrawArrays(GL_LINE_STRIP, 0, NUMVERTS);
+			break;
+		case 3:
+			glDrawArrays(GL_LINES, 0, NUMVERTS);
+			break;
+		default:
+			glDrawArrays(GL_TRIANGLES, 0, NUMVERTS);
+			break;
 
+		}
 	}
 	void update() {
 		mat4 t = objective->getTransforms();
@@ -291,7 +359,24 @@ public:
 		glUniform1f(gGreenLocation, colour.g);
 		glUniform1f(gBlueLocation, colour.b);
 		glUniformMatrix4fv(gModelToWorldTransformLoc, 1, GL_FALSE, &transforms[0][0]);
-		glDrawArrays(GL_TRIANGLES, 0, NUMVERTS);
+		switch (mode) {
+		case 0:
+			glDrawArrays(GL_TRIANGLES, 0, NUMVERTS);
+			break;
+		case 1:
+			glDrawArrays(GL_POINTS, 0, NUMVERTS);
+			break;
+		case 2:
+			glDrawArrays(GL_LINE_STRIP, 0, NUMVERTS);
+			break;
+		case 3:
+			glDrawArrays(GL_LINES, 0, NUMVERTS);
+			break;
+		default:
+			glDrawArrays(GL_TRIANGLES, 0, NUMVERTS);
+			break;
+
+		}
 	}
 	void update() {
 		transforms = translate(transforms, vec3(movex, movey, movez));
@@ -307,11 +392,13 @@ public:
 };
 
 
-
+//declared global for the keylistener
 GameObject* objects[10];
 int objectsSize = 0;
 
 void keyPressed(unsigned char key, int x, int y) {
+	int i = 0;
+	//movement of player 1 
 	if (key == 'w') {
 		objects[1]->translateOBJ(0.0f, 0.5f, 0.0f);
 	}
@@ -324,8 +411,28 @@ void keyPressed(unsigned char key, int x, int y) {
 	if (key == 'a') {
 		objects[1]->translateOBJ(-0.5f, 0.0f, 0.0f);
 	}
+
+	//mode of the render
+
+	if (key == '0') {
+		for (i = 0; i < objectsSize; i++)
+			objects[i]->setMode(0);
+	}
+	if (key == '1') {
+		for (i = 0; i < objectsSize; i++)
+			objects[i]->setMode(1);
+	}
+	if (key == '2') {
+		for (i = 0; i < objectsSize; i++)
+			objects[i]->setMode(2);
+	}
+	if (key == '3') {
+		for (i = 0; i < objectsSize; i++)
+			objects[i]->setMode(3);
+	}
 	mat4 t = objects[1]->getTransforms();
-	cout <<" X " << t[3].x << " Y " << t[3].y <<  "\n";
+	for (i = 0; i < objectsSize; i++)
+		objects[i]->render();
 }
 
 
